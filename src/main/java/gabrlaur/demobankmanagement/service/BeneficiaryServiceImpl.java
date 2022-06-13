@@ -26,6 +26,10 @@ public class BeneficiaryServiceImpl implements BeneficiaryService {
 
     @Override
     public Beneficiary createBeneficiary(Beneficiary newBeneficiary) {
+        if (this.beneficiaryRepository.findByAccountNumber(newBeneficiary.getAccountNumber()).isPresent()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Beneficiary account number not unique");
+        }
+
         return this.beneficiaryRepository.save(newBeneficiary);
     }
 
