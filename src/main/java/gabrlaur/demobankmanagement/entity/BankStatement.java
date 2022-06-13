@@ -1,5 +1,8 @@
 package gabrlaur.demobankmanagement.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
 
@@ -14,6 +17,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Getter
 @Setter
+@JsonPropertyOrder({"id", "dateTime", "comment", "amount", "currency"})
 public class BankStatement {
 
     @Id
@@ -24,11 +28,13 @@ public class BankStatement {
 
     @Column(name = "date_time", nullable = false)
     @NotNull
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd hh:mm:ss")
     private LocalDateTime dateTime;
 
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "beneficiary_id", referencedColumnName = "id", nullable = false)
     @NotNull
+    @JsonIgnore
     private Beneficiary beneficiary;
 
     @Column(name = "comment")
