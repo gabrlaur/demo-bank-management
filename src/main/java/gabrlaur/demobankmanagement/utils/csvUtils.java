@@ -12,10 +12,10 @@ import java.util.List;
 
 public class csvUtils {
     @SneakyThrows
-    public static String getBankStatementCsv(Iterable<BankStatement> bankStatements) {
+    public static String getBankStatementCsv(Iterable<BankStatementDetails> bankStatements) {
         CsvMapper mapper = new CsvMapper();
         mapper.findAndRegisterModules();
-        CsvSchema schema = mapper.schemaFor(BankStatement.class);
+        CsvSchema schema = mapper.schemaFor(BankStatementDetails.class);
         return mapper.writer(schema.withUseHeader(true)).writeValueAsString(bankStatements);
     }
 

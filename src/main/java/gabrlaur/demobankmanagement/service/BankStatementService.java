@@ -10,7 +10,7 @@ public interface BankStatementService {
 
     Iterable<BankStatement> getAllBankStatements();
 
-    Iterable<BankStatement> getBankStatementsByBeneficiaryIdAndDates(Long id, String startDateTime, String endDateTime);
+    Iterable<BankStatementDetails> getBankStatementsByBeneficiaryIdAndDates(Long id, String startDateTime, String endDateTime);
 
     BankStatement createBankStatement(BankStatementRequest bankStatement);
 

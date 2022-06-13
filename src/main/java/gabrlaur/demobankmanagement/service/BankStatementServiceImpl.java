@@ -8,6 +8,7 @@ import gabrlaur.demobankmanagement.entity.Beneficiary;
 import gabrlaur.demobankmanagement.repository.BankStatementRepository;
 import gabrlaur.demobankmanagement.repository.BeneficiaryRepository;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -19,6 +20,7 @@ import java.util.List;
 
 @Service
 @AllArgsConstructor
+@Slf4j
 public class BankStatementServiceImpl implements BankStatementService {
     private final BankStatementRepository bankStatementRepository;
 
@@ -37,32 +39,32 @@ public class BankStatementServiceImpl implements BankStatementService {
     }
 
     @Override
-    public Iterable<BankStatement> getBankStatementsByBeneficiaryIdAndDates(Long id, String startDateTime, String endDateTime) {
+    public Iterable<BankStatementDetails> getBankStatementsByBeneficiaryIdAndDates(Long id, String startDateTime, String endDateTime) {
         if (id != null && startDateTime != null && endDateTime != null) {
             Beneficiary beneficiary = new Beneficiary();
             beneficiary.setId(id);
-            return this.bankStatementRepository.findAllByBeneficiaryAndDateTimeBetween(beneficiary,
-                    LocalDateTime.parse(startDateTime), LocalDateTime.parse(endDateTime));
+            return mapBankStatementToDetails(this.bankStatementRepository.findAllByBeneficiaryAndDateTimeBetween(beneficiary,
+                    LocalDateTime.parse(startDateTime), LocalDateTime.parse(endDateTime)));
         } else if (id != null && startDateTime != null) {
             Beneficiary beneficiary = new Beneficiary();
             beneficiary.setId(id);
-            return this.bankStatementRepository.findAllByBeneficiaryAndDateTimeGreaterThanEqual(beneficiary,
-                    LocalDateTime.parse(startDateTime));
+            return mapBankStatementToDetails(this.bankStatementRepository.findAllByBeneficiaryAndDateTimeGreaterThanEqual(beneficiary,
+                    LocalDateTime.parse(startDateTime)));
         } else if (id != null && endDateTime != null) {
             Beneficiary beneficiary = new Beneficiary();
             beneficiary.setId(id);
-            return this.bankStatementRepository.findAllByBeneficiaryAndDateTimeLessThanEqual(beneficiary,
-                    LocalDateTime.parse(endDateTime));
+            return mapBankStatementToDetails(this.bankStatementRepository.findAllByBeneficiaryAndDateTimeLessThanEqual(beneficiary,
+                    LocalDateTime.parse(endDateTime)));
         } else if (id != null) {
             Beneficiary beneficiary = new Beneficiary();
             beneficiary.setId(id);
-            return this.bankStatementRepository.findAllByBeneficiary(beneficiary);
+            return mapBankStatementToDetails(this.bankStatementRepository.findAllByBeneficiary(beneficiary));
         } else if (startDateTime != null && endDateTime != null) {
-            return this.bankStatementRepository.findAllByDateTimeBetween(LocalDateTime.parse(startDateTime), LocalDateTime.parse(endDateTime));
+            return mapBankStatementToDetails(this.bankStatementRepository.findAllByDateTimeBetween(LocalDateTime.parse(startDateTime), LocalDateTime.parse(endDateTime)));
         } else if (startDateTime != null) {
-            return this.bankStatementRepository.findAllByDateTimeGreaterThanEqual(LocalDateTime.parse(startDateTime));
+            return mapBankStatementToDetails(this.bankStatementRepository.findAllByDateTimeGreaterThanEqual(LocalDateTime.parse(startDateTime)));
         } else if (endDateTime != null) {
-            return this.bankStatementRepository.findAllByDateTimeLessThanEqual(LocalDateTime.parse(endDateTime));
+            return mapBankStatementToDetails(this.bankStatementRepository.findAllByDateTimeLessThanEqual(LocalDateTime.parse(endDateTime)));
         } else return null;
     }
 
@@ -120,12 +122,21 @@ public class BankStatementServiceImpl implements BankStatementService {
 
     @Override
     public AccountTotal getAccountTotal(Long id, String startDateTime, String endDateTime) {
-        List<BankStatement> bankStatements = (ArrayList<BankStatement>) getBankStatementsByBeneficiaryIdAndDates(id, startDateTime, endDateTime);
+        List<BankStatementDetails> bankStatements = (ArrayList<BankStatementDetails>) getBankStatementsByBeneficiaryIdAndDates(id, startDateTime, endDateTime);
         BigDecimal total = BigDecimal.valueOf(0);
-        for (BankStatement bankStatement : bankStatements) {
+        for (BankStatementDetails bankStatement : bankStatements) {
             total = total.add(bankStatement.getAmount());
         }
-        return new AccountTotal(this.beneficiaryRepository.findById(id).orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Beneficiary not found")).getAccountNumber(), total);
+        if (bankStatements.size() > 0)
+            return new AccountTotal(bankStatements.get(0).getAccount(), total);
+        return null;
+    }
+
+    private Iterable<BankStatementDetails> mapBankStatementToDetails(Iterable<BankStatement> bankStatements) {
+        List<BankStatementDetails> bankStatementDetails = new ArrayList<>();
+        bankStatements.forEach((bankStatement) -> bankStatementDetails.add(new BankStatementDetails(bankStatement.getBeneficiary().getAccountNumber(),
+                bankStatement.getComment(), bankStatement.getAmount(), bankStatement.getCurrency(), bankStatement.getDateTime().toString()))
+        );
+        return bankStatementDetails;
     }
 }

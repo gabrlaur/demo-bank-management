@@ -25,13 +25,6 @@ public class BankStatementController {
         return this.bankStatementService.getAllBankStatements();
     }
 
-    @GetMapping(value = "/filter", produces = "text/csv")
-    public String getBankStatements(@RequestParam(required = false) Long id,
-                                    @RequestParam(required = false) String startDateTime,
-                                    @RequestParam(required = false) String endDateTime) {
-        return csvUtils.getBankStatementCsv(this.bankStatementService.getBankStatementsByBeneficiaryIdAndDates(id, startDateTime, endDateTime));
-    }
-
     @PostMapping
     public BankStatement createBankStatement(@RequestBody BankStatementRequest bankStatement) {
         return this.bankStatementService.createBankStatement(bankStatement);
@@ -53,10 +46,17 @@ public class BankStatementController {
         return this.bankStatementService.uploadBankStatementCSV(csvUtils.readBankStatementFromCSV(bankStatementCsv));
     }
 
-    @GetMapping(value = "/total", produces = "text/csv")
-    public String getAccountTotal(@RequestParam(required = false) Long id,
+    @GetMapping(value = "/filter", produces = "text/csv")
+    public String getBankStatements(@RequestParam(required = false) Long id,
                                     @RequestParam(required = false) String startDateTime,
                                     @RequestParam(required = false) String endDateTime) {
+        return csvUtils.getBankStatementCsv(this.bankStatementService.getBankStatementsByBeneficiaryIdAndDates(id, startDateTime, endDateTime));
+    }
+
+    @GetMapping(value = "/total", produces = "text/csv")
+    public String getAccountTotal(@RequestParam Long id,
+                                  @RequestParam(required = false) String startDateTime,
+                                  @RequestParam(required = false) String endDateTime) {
         return csvUtils.getAccountTotalCsv(this.bankStatementService.getAccountTotal(id, startDateTime, endDateTime));
     }
 }
