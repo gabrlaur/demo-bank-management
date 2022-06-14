@@ -89,7 +89,7 @@ public class BankStatementServiceImpl implements BankStatementService {
         bankStatement.setCurrency(newBankStatement.getCurrency());
         bankStatement.setComment(newBankStatement.getComment());
         bankStatement.setDateTime(LocalDateTime.now());
-        bankStatement.setBeneficiary(this.beneficiaryRepository.findById(id).orElseThrow(
+        bankStatement.setBeneficiary(this.beneficiaryRepository.findById(newBankStatement.getBeneficiaryId()).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Beneficiary not found")
         ));
 
