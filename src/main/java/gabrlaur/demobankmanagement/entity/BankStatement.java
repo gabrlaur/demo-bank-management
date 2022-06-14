@@ -31,7 +31,7 @@ public class BankStatement {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd hh:mm:ss")
     private LocalDateTime dateTime;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.DETACH)
     @JoinColumn(name = "beneficiary_id", referencedColumnName = "id", nullable = false)
     @NotNull
     @JsonIgnore
