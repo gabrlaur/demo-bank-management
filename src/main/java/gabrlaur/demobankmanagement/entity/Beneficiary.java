@@ -34,6 +34,6 @@ public class Beneficiary {
     private String accountNumber;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "beneficiary")
+    @OneToMany(mappedBy = "beneficiary", cascade = CascadeType.REMOVE)
     private Set<BankStatement> bankStatementSet;
 }
