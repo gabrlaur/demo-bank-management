@@ -10,6 +10,7 @@ public interface BankStatementRepository extends JpaRepository<BankStatement, Lo
     Iterable<BankStatement> findAllByBeneficiaryAndDateTimeBetween(Beneficiary beneficiary,
                                                                    LocalDateTime startDateTime,
                                                                    LocalDateTime endDateTime);
+
     Iterable<BankStatement> findAllByBeneficiaryAndDateTimeLessThanEqual(Beneficiary beneficiary, LocalDateTime endDateTime);
 
     Iterable<BankStatement> findAllByBeneficiaryAndDateTimeGreaterThanEqual(Beneficiary beneficiary, LocalDateTime startDateTime);
@@ -21,5 +22,4 @@ public interface BankStatementRepository extends JpaRepository<BankStatement, Lo
     Iterable<BankStatement> findAllByDateTimeGreaterThanEqual(LocalDateTime startDateTime);
 
     Iterable<BankStatement> findAllByBeneficiary(Beneficiary beneficiary);
-
 }
